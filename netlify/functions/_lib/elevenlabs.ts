@@ -2,7 +2,7 @@
 
 import { requireEnv } from './util';
 
-const DEFAULT_VOICE_ID = 'onwK4e9ZLuTAKqWW03oN'; // Daniel
+const DEFAULT_VOICE_ID = 'onwK4e9ZLuTAKqWW03F9'; // Daniel
 const MODEL_ID = 'eleven_multilingual_v2';
 
 export async function synthesize(text: string): Promise<ArrayBuffer> {

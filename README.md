@@ -40,7 +40,7 @@ Built for Brennan, by Tom Caswell.
 * Storage: Netlify Blobs (one namespace for story JSON, one for media).
 * Story text: Anthropic Claude (default model: claude-sonnet-4-6).
 * Images: Fal.ai flux/schnell (square_hd, cartoon style).
-* Narration: ElevenLabs Daniel voice (voice id onwK4e9ZLuTAKqWW03oN).
+* Narration: ElevenLabs Daniel voice (voice id onwK4e9ZLuTAKqWW03F9).
 * Moderation: OpenAI omni-moderation-latest.
 * Speech in the browser: SpeechSynthesis (TTS for questions) and Web Speech
   API (STT for answers, with a typed fallback).
