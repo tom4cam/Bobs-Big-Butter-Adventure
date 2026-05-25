@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { useT } from '../i18n';
 import { SettingsCog } from './SettingsCog';
@@ -10,6 +10,13 @@ interface Props {
 
 export function Layout({ children, showExit = false }: Props) {
   const t = useT();
+  const navigate = useNavigate();
+
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
+
   return (
     <div className="page">
       <div className="header">
@@ -19,9 +26,15 @@ export function Layout({ children, showExit = false }: Props) {
         </Link>
         <div className="header-actions">
           {showExit && (
-            <Link to="/" className="exit-btn" aria-label={t('story.backHome')} title={t('story.backHome')}>
-              {'×'}
-            </Link>
+            <button
+              type="button"
+              className="back-btn"
+              onClick={goBack}
+              aria-label={t('nav.back')}
+              title={t('nav.back')}
+            >
+              <span aria-hidden="true">{'←'}</span> {t('nav.back')}
+            </button>
           )}
           <SettingsCog />
         </div>

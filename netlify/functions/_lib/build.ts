@@ -90,6 +90,11 @@ interface BuildOptions {
   paragraphs: { text: string; image_prompt?: string; image_url: string | null; regenerate_image?: boolean }[];
 }
 
+// Fal's free tier caps concurrent image requests at 10. Cap our own
+// fan-out below that so large stories (e.g., Bob's 20 stanzas) don't
+// fail with 429. Narration still runs in parallel with image batches.
+const FAL_CONCURRENCY = 6;
+
 // Builds the assets (any missing images + fresh narration audio) and saves
 // the story as the canonical {id}/v{n}.json record plus updating the
 // {id}/index.json summary.
@@ -97,19 +102,7 @@ export async function buildAndSaveVersion(opts: BuildOptions): Promise<StoryVers
   const id = opts.id ?? randomUUID();
   const title = opts.title?.trim() || 'A Brand New Story';
 
-  const tasks = opts.paragraphs.map(async (p, i) => {
-    const needsImage = p.regenerate_image || !p.image_url;
-    if (!needsImage) {
-      return { text: p.text, image_url: p.image_url, image_prompt: p.image_prompt } satisfies Paragraph;
-    }
-    const prompt = p.image_prompt && p.image_prompt.trim().length > 0
-      ? p.image_prompt
-      : await regenerateImagePrompt(p.text, title);
-    const img = await generateImage(prompt);
-    const url = await storeMedia(`${id}-v${opts.version}-p${i + 1}.png`, img.data, img.contentType);
-    return { text: p.text, image_url: url, image_prompt: prompt } satisfies Paragraph;
-  });
-
+  // Kick narration off immediately; it runs alongside the image batches.
   const paragraphTexts = opts.paragraphs.map((p) => p.text);
   const narrationText = paragraphTexts.join('\n\n');
   const narrationTask = synthesize(narrationText, { voiceId: opts.voiceId }).then(async ({ audio, alignment }) => {
@@ -118,7 +111,30 @@ export async function buildAndSaveVersion(opts: BuildOptions): Promise<StoryVers
     return { url, words };
   });
 
-  const [paragraphs, narration] = await Promise.all([Promise.all(tasks), narrationTask]);
+  // Process paragraphs in concurrency-capped batches so Fal isn't asked
+  // for more than FAL_CONCURRENCY images at once. Paragraphs whose image
+  // is already present just pass through inside the batch without
+  // calling Fal.
+  const paragraphs: Paragraph[] = new Array(opts.paragraphs.length);
+  for (let start = 0; start < opts.paragraphs.length; start += FAL_CONCURRENCY) {
+    const slice = opts.paragraphs.slice(start, start + FAL_CONCURRENCY);
+    const results = await Promise.all(slice.map(async (p, j) => {
+      const i = start + j;
+      const needsImage = p.regenerate_image || !p.image_url;
+      if (!needsImage) {
+        return { text: p.text, image_url: p.image_url, image_prompt: p.image_prompt } satisfies Paragraph;
+      }
+      const prompt = p.image_prompt && p.image_prompt.trim().length > 0
+        ? p.image_prompt
+        : await regenerateImagePrompt(p.text, title);
+      const img = await generateImage(prompt);
+      const url = await storeMedia(`${id}-v${opts.version}-p${i + 1}.png`, img.data, img.contentType);
+      return { text: p.text, image_url: url, image_prompt: prompt } satisfies Paragraph;
+    }));
+    for (let j = 0; j < results.length; j += 1) paragraphs[start + j] = results[j];
+  }
+
+  const narration = await narrationTask;
 
   const version: StoryVersion = {
     id,

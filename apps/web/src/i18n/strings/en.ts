@@ -85,6 +85,9 @@ export const en = {
   'mic.unavailable': 'Voice input is not supported in this browser. You can still type your answer. (Chrome and Edge work best for voice.)',
   'mic.notHeard': 'Sorry, I did not catch that. Please try again.',
 
+  // Navigation
+  'nav.back': 'Back',
+
   // Audio player
   'audio.play': 'Play',
   'audio.pause': 'Pause',

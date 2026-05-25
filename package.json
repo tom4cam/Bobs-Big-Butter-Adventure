@@ -12,7 +12,8 @@
     "preview": "npm --workspace apps/web run preview",
     "typecheck": "npm --workspace apps/web run typecheck && tsc --noEmit -p netlify/functions",
     "seed:stories": "tsx scripts/seed-default-stories.ts",
-    "seed:samples": "tsx scripts/seed-voice-samples.ts"
+    "seed:samples": "tsx scripts/seed-voice-samples.ts",
+    "revert": "tsx scripts/revert-story.ts"
   },
   "devDependencies": {
     "@netlify/functions": "^2.8.0",
