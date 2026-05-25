@@ -6,6 +6,7 @@ interface WorkerRequest {
   id: string;
   version: number;
   answers: StoryAnswer[];
+  language: 'en' | 'sv';
 }
 
 // Background worker: runs the actual story generation pipeline. Netlify
@@ -24,8 +25,12 @@ export default async (req: Request, _ctx: Context): Promise<Response> => {
     console.error('background worker missing fields', body);
     return new Response('bad request', { status: 400 });
   }
+  if (body.language !== 'en' && body.language !== 'sv') {
+    console.error('background worker missing language', body);
+    return new Response('bad request', { status: 400 });
+  }
   try {
-    const story = await buildFromAnswers(body.id, body.answers);
+    const story = await buildFromAnswers(body.id, body.answers, body.language);
     console.log('story built', story.id, story.title, story.paragraphs.length, 'paragraphs');
   } catch (e) {
     const message = e instanceof ModerationError
@@ -38,6 +43,7 @@ export default async (req: Request, _ctx: Context): Promise<Response> => {
         version: body.version || 1,
         sourceAnswers: body.answers,
         error: message,
+        language: body.language,
       });
     } catch (saveErr) {
       console.error('Could not record failure state', saveErr);

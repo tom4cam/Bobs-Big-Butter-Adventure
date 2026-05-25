@@ -7,6 +7,7 @@ interface WorkerRequest {
   version: number;
   title: string;
   sourceAnswers: StoryAnswer[];
+  language: 'en' | 'sv';
   paragraphs: { text: string; image_url: string | null; image_prompt?: string; regenerate_image?: boolean }[];
 }
 
@@ -18,12 +19,17 @@ export default async (req: Request, _ctx: Context): Promise<Response> => {
     console.error('update worker bad body', e);
     return new Response('bad request', { status: 400 });
   }
+  if (body.language !== 'en' && body.language !== 'sv') {
+    console.error('update worker missing language', body);
+    return new Response('bad request', { status: 400 });
+  }
   try {
     const story = await buildAndSaveVersion({
       id: body.id,
       version: body.version,
       title: body.title,
       sourceAnswers: body.sourceAnswers,
+      language: body.language,
       paragraphs: body.paragraphs,
     });
     console.log('story updated', story.id, 'v' + story.version);
@@ -34,6 +40,7 @@ export default async (req: Request, _ctx: Context): Promise<Response> => {
         id: body.id,
         version: body.version,
         sourceAnswers: body.sourceAnswers,
+        language: body.language,
         error: `Something went wrong while saving the new version: ${(e as Error).message}`,
       });
     } catch (saveErr) {

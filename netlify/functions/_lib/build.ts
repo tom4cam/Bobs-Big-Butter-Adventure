@@ -34,6 +34,7 @@ export async function saveGeneratingStub(opts: {
   id: string;
   version: number;
   sourceAnswers: StoryAnswer[];
+  language: 'en' | 'sv';
 }): Promise<StoryVersion> {
   const stub: StoryVersion = {
     id: opts.id,
@@ -44,6 +45,7 @@ export async function saveGeneratingStub(opts: {
     source_answers: opts.sourceAnswers,
     created_at: new Date().toISOString(),
     status: 'generating',
+    language: opts.language,
   };
   await saveStoryVersion(stub);
   return stub;
@@ -56,6 +58,7 @@ export async function saveFailedVersion(opts: {
   version: number;
   sourceAnswers: StoryAnswer[];
   error: string;
+  language: 'en' | 'sv';
 }): Promise<void> {
   const rec: StoryVersion = {
     id: opts.id,
@@ -67,6 +70,7 @@ export async function saveFailedVersion(opts: {
     created_at: new Date().toISOString(),
     status: 'failed',
     error: opts.error,
+    language: opts.language,
   };
   await saveStoryVersion(rec);
 }
@@ -76,6 +80,7 @@ interface BuildOptions {
   version: number;
   title?: string;
   sourceAnswers: StoryAnswer[];
+  language: 'en' | 'sv';
   paragraphs: { text: string; image_prompt?: string; image_url: string | null; regenerate_image?: boolean }[];
 }
 
@@ -115,6 +120,7 @@ export async function buildAndSaveVersion(opts: BuildOptions): Promise<StoryVers
     source_answers: opts.sourceAnswers,
     created_at: new Date().toISOString(),
     status: 'ready',
+    language: opts.language,
   };
   await saveStoryVersion(version);
   return version;
@@ -122,14 +128,15 @@ export async function buildAndSaveVersion(opts: BuildOptions): Promise<StoryVers
 
 // Generates a story from the kid's answers (moderates first), then builds
 // the assets. Throws ModerationError if anything is flagged.
-export async function buildFromAnswers(id: string, answers: StoryAnswer[]): Promise<StoryVersion> {
+export async function buildFromAnswers(id: string, answers: StoryAnswer[], language: 'en' | 'sv'): Promise<StoryVersion> {
   await moderateAnswers(answers);
-  const generated = await safelyGenerate(answers);
+  const generated = await safelyGenerate(answers, language);
   return buildAndSaveVersion({
     id,
     version: 1,
     title: generated.title,
     sourceAnswers: answers,
+    language,
     paragraphs: generated.paragraphs.map((p) => ({
       text: p.text,
       image_prompt: p.image_prompt,
@@ -138,8 +145,8 @@ export async function buildFromAnswers(id: string, answers: StoryAnswer[]): Prom
   });
 }
 
-async function safelyGenerate(answers: StoryAnswer[]): Promise<GeneratedStory> {
-  const generated = await generateStory(answers);
+async function safelyGenerate(answers: StoryAnswer[], language: 'en' | 'sv'): Promise<GeneratedStory> {
+  const generated = await generateStory(answers, language);
   const fullText = `${generated.title}\n\n${generated.paragraphs.map((p) => p.text).join('\n\n')}`;
   const result = await moderate(fullText);
   if (result.flagged) {

@@ -31,7 +31,9 @@ JSON shape:
 
 Image prompts: describe one clear scene per paragraph in cartoon style, child friendly, around 20 words. Mention the main character and the setting each time so the illustrator stays consistent.`;
 
-export async function generateStory(answers: StoryAnswer[]): Promise<GeneratedStory> {
+const LANG_NAMES: Record<'en' | 'sv', string> = { en: 'English', sv: 'Swedish (svenska)' };
+
+export async function generateStory(answers: StoryAnswer[], language: 'en' | 'sv'): Promise<GeneratedStory> {
   const apiKey = requireEnv('ANTHROPIC_API_KEY');
   const client = new Anthropic({ apiKey });
   const model = process.env.ANTHROPIC_MODEL || DEFAULT_MODEL;
@@ -40,6 +42,9 @@ export async function generateStory(answers: StoryAnswer[]): Promise<GeneratedSt
     .map((a) => `${a.question}\n${a.answer}`)
     .join('\n\n');
 
+  const langName = LANG_NAMES[language];
+  const languageInstruction = `Write the title and every paragraph's "text" in ${langName}. Keep every "image_prompt" in English so the image model understands it.`;
+
   const response = await client.messages.create({
     model,
     max_tokens: 2500,
@@ -47,7 +52,7 @@ export async function generateStory(answers: StoryAnswer[]): Promise<GeneratedSt
     messages: [
       {
         role: 'user',
-        content: `Here are the kid's answers. Use them to write the story.\n\n${formattedAnswers}\n\nReturn only the JSON object.`,
+        content: `Here are the kid's answers. Use them to write the story.\n\n${formattedAnswers}\n\n${languageInstruction}\n\nReturn only the JSON object.`,
       },
     ],
   });

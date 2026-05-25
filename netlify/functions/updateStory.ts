@@ -26,13 +26,16 @@ export default async (req: Request, _ctx: Context): Promise<Response> => {
   const idx = await getStoryIndex(body.id);
   if (!idx) return notFound('That story does not exist.');
   const previous = await getStoryVersion(body.id, idx.latest_version);
+  if (!previous) return notFound('That story version is missing.');
 
+  const language = previous.language ?? 'en';
   const nextVersion = idx.latest_version + 1;
   try {
     await saveGeneratingStub({
       id: body.id,
       version: nextVersion,
-      sourceAnswers: previous?.source_answers ?? [],
+      sourceAnswers: previous.source_answers ?? [],
+      language,
     });
   } catch (e) {
     console.error('updateStory stub failed', e);
@@ -48,7 +51,8 @@ export default async (req: Request, _ctx: Context): Promise<Response> => {
         id: body.id,
         version: nextVersion,
         title: body.title || idx.title,
-        sourceAnswers: previous?.source_answers ?? [],
+        sourceAnswers: previous.source_answers ?? [],
+        language,
         paragraphs: body.paragraphs.map((p) => ({
           text: p.text,
           image_url: p.image_url ?? null,
@@ -69,7 +73,8 @@ export default async (req: Request, _ctx: Context): Promise<Response> => {
     title: body.title || idx.title,
     paragraphs: [],
     narration_url: null,
-    source_answers: previous?.source_answers ?? [],
+    source_answers: previous.source_answers ?? [],
     created_at: new Date().toISOString(),
+    language,
   }, 202);
 };
