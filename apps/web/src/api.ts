@@ -16,11 +16,15 @@ async function jsonOrThrow<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export async function createStory(answers: StoryAnswer[], language: 'en' | 'sv'): Promise<StoryVersion> {
+export async function createStory(
+  answers: StoryAnswer[],
+  language: 'en' | 'sv',
+  voiceId: string
+): Promise<StoryVersion> {
   const res = await fetch(`${FN_BASE}/createStory`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ answers, language }),
+    body: JSON.stringify({ answers, language, voice_id: voiceId }),
   });
   return jsonOrThrow<StoryVersion>(res);
 }
