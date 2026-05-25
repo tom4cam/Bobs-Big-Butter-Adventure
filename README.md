@@ -81,6 +81,25 @@ npx netlify dev
 The dev server serves the Vite app on http://localhost:8888 and proxies
 `/.netlify/functions/*` to the local functions runtime.
 
+## Seeding default content
+
+Two one-shot scripts populate the home page with seed content:
+
+```bash
+# Generate the 4 voice-sample MP3s for the voice picker. Run once.
+npm run seed:samples
+git add apps/web/public/voice-samples/
+git commit -m "Add voice samples"
+
+# Seed Bob's Big Butter Adventure (en) and Pip Draken (sv) as defaults.
+# Idempotent; re-running overwrites the same fixed ids.
+npm run seed:stories
+```
+
+Both scripts read the standard `.env` file. `seed:stories` additionally
+requires `NETLIFY_SITE_ID` and `NETLIFY_AUTH_TOKEN` so it can write to
+Netlify Blobs from a local Node process.
+
 ## Deploy
 
 The repo is wired to deploy on Netlify. After the first push:
