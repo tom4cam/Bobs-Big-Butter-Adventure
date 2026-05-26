@@ -6,9 +6,10 @@
 //   R2_ACCESS_KEY_ID         R2 API access key id
 //   R2_SECRET_ACCESS_KEY     R2 API secret
 //
-//   npm run seed:stories                     # both stories
-//   npm run seed:stories -- --only=bob       # just Bob
+//   npm run seed:stories                     # all three defaults
+//   npm run seed:stories -- --only=bob       # just Bob (en)
 //   npm run seed:stories -- --only=pip       # just Pip (sv)
+//   npm run seed:stories -- --only=pip-en    # just Pip (en)
 //
 // Both stories are idempotent: fixed ids, overwrite on re-run.
 
@@ -49,8 +50,10 @@ async function generateImagesBatched(
 
 const BOB_ID = 'default-bobs-butter';
 const PIP_ID = 'default-pip-bread';
+const PIP_EN_ID = 'default-pip-bread-en';
 
 const DANIEL_VOICE = 'onyx';   // Daniel slot — OpenAI tts-1 male voice
+const RACHEL_VOICE = 'nova';   // Rachel slot — OpenAI tts-1 female voice
 const SANNA_VOICE = 'shimmer'; // Sanna slot — OpenAI tts-1 female voice
 
 const CLAUDE_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
@@ -139,6 +142,27 @@ async function seedPipSwedish() {
   console.log(`Pip-sv seeded: ${v.id} v${v.version}, ${v.paragraphs.length} paragraphs`);
 }
 
+async function seedPipEnglish() {
+  console.log('Seeding Pip (en)...');
+  console.log('  generating images (batched)...');
+  const urls = await generateImagesBatched(PIP_EN_ID, 1, PIP_PARAGRAPHS_EN.map((p) => p.image_prompt));
+  const paragraphs = PIP_PARAGRAPHS_EN.map((p, i) => ({
+    text: p.text,
+    image_prompt: p.image_prompt,
+    image_url: urls[i],
+  }));
+  const v = await buildAndSaveVersion(env, {
+    id: PIP_EN_ID,
+    version: 1,
+    title: PIP_TITLE_EN,
+    sourceAnswers: [{ question: 'Default story', answer: PIP_TITLE_EN }],
+    language: 'en',
+    voiceId: RACHEL_VOICE,
+    paragraphs,
+  });
+  console.log(`Pip-en seeded: ${v.id} v${v.version}, ${v.paragraphs.length} paragraphs`);
+}
+
 async function main() {
   const required = ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'FAL_KEY'];
   const missing = required.filter((k) => !process.env[k]);
@@ -150,6 +174,7 @@ async function main() {
   const only = onlyArg ? onlyArg.slice('--only='.length) : null;
   if (!only || only === 'bob') await seedBob();
   if (!only || only === 'pip') await seedPipSwedish();
+  if (!only || only === 'pip-en') await seedPipEnglish();
   console.log('Done.');
 }
 
