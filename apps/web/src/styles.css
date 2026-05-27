@@ -180,6 +180,12 @@ textarea, input[type=text] {
 .row.right { justify-content: flex-end; }
 .row.between { justify-content: space-between; }
 
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
 .progress {
   height: 14px;
   width: 100%;

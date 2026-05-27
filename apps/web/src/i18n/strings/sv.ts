@@ -17,7 +17,10 @@ export const sv: Record<StringKey, string> = {
   // Create page chrome
   'create.langStepTitle': 'Välj ett språk för din saga.',
   'create.langStepEn': 'English',
-  'create.langStepSv': 'Svenska',
+  'create.langStepSv': 'Svenska (Swedish)',
+  'create.langStepBg': 'Български (Bulgarian)',
+  'create.langStepEs': 'Español (Spanish)',
+  'create.langStepFr': 'Français (French)',
   'create.hearAgain': 'Hör frågan igen',
   'create.skipThis': 'Hoppa över',
   'create.next': 'Nästa',

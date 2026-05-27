@@ -112,26 +112,21 @@ export function CreatePage() {
   // STEP: pick story language
   // -----------------------------------------------------------
   if (!storyLang) {
-    const suggested = uiLang;
     return (
       <Layout>
         <div className="card">
           <div className="question">{t('create.langStepTitle')}</div>
-          <div className="row" style={{ marginTop: 16 }}>
-            <button
-              type="button"
-              className={`btn${suggested === 'en' ? ' sun' : ''}`}
-              onClick={() => { setStoryLang('en'); setVoiceKey(defaultVoiceFor('en').key); setStepKind('opener'); }}
-            >
-              {t('create.langStepEn')}
-            </button>
-            <button
-              type="button"
-              className={`btn${suggested === 'sv' ? ' sun' : ''}`}
-              onClick={() => { setStoryLang('sv'); setVoiceKey(defaultVoiceFor('sv').key); setStepKind('opener'); }}
-            >
-              {t('create.langStepSv')}
-            </button>
+          <div className="lang-grid" style={{ marginTop: 16 }}>
+            {(['en','sv','bg','es','fr'] as const).map((code) => (
+              <button
+                key={code}
+                type="button"
+                className={`btn${uiLang === code ? ' sun' : ''}`}
+                onClick={() => { setStoryLang(code); setVoiceKey(defaultVoiceFor(code).key); setStepKind('opener'); }}
+              >
+                {t(`create.langStep${code[0].toUpperCase()}${code[1]}` as 'create.langStepEn')}
+              </button>
+            ))}
           </div>
           <p className="subtle" style={{ marginTop: 16 }}>
             {t('home.heroBody')}
