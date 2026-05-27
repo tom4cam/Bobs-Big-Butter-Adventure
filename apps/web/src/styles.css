@@ -498,6 +498,24 @@ ul.answer-list li b { color: var(--ink-soft); }
 }
 .cog-segmented button.on { background: var(--sun); }
 .cog-segmented button + button { border-left: 3px solid var(--ink); }
+.cog-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cog-pills button {
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  border-radius: 14px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.cog-pills button.on {
+  background: var(--sun);
+  font-weight: 700;
+}
 .cog-close {
   width: 100%;
   background: var(--accent-soft);

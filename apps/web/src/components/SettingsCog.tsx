@@ -38,23 +38,18 @@ export function SettingsCog() {
         <div className="cog-popover" role="dialog" aria-label={t('settings.title')}>
           <div className="cog-row">
             <span className="cog-label">{t('settings.language')}</span>
-            <div className="cog-segmented">
-              <button
-                type="button"
-                className={lang === 'en' ? 'on' : ''}
-                onClick={() => setLang('en')}
-                aria-pressed={lang === 'en'}
-              >
-                {t('settings.languageEn')}
-              </button>
-              <button
-                type="button"
-                className={lang === 'sv' ? 'on' : ''}
-                onClick={() => setLang('sv')}
-                aria-pressed={lang === 'sv'}
-              >
-                {t('settings.languageSv')}
-              </button>
+            <div className="cog-pills">
+              {(['en', 'sv', 'bg', 'es', 'fr'] as const).map((code) => (
+                <button
+                  key={code}
+                  type="button"
+                  className={lang === code ? 'on' : ''}
+                  onClick={() => setLang(code)}
+                  aria-pressed={lang === code}
+                >
+                  {t(`settings.language${code[0].toUpperCase()}${code[1]}` as 'settings.languageEn')}
+                </button>
+              ))}
             </div>
           </div>
           <div className="cog-row">
