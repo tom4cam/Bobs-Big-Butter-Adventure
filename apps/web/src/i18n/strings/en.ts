@@ -11,6 +11,8 @@ export const en = {
   'home.recentHeading': 'Recent stories',
   'home.recentLoading': 'Loading recent stories...',
   'home.recentEmpty': 'No stories yet. Tap the big yellow button to make the first one.',
+  'home.filterAll': 'All recent',
+  'home.filterMine': 'Just mine',
 
   // Create page chrome
   'create.langStepTitle': 'Pick a language for your story.',

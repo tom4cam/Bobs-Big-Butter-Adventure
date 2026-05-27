@@ -522,6 +522,23 @@ ul.answer-list li b { color: var(--ink-soft); }
   background: var(--sun);
   font-weight: 700;
 }
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.filter-pills button {
+  border: 3px solid var(--ink);
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 6px 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.filter-pills button.on {
+  background: var(--sun);
+}
 .cog-close {
   width: 100%;
   background: var(--accent-soft);

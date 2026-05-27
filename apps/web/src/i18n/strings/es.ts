@@ -8,6 +8,8 @@ export const es = {
   "home.recentHeading": "Cuentos recientes",
   "home.recentLoading": "Cargando cuentos recientes...",
   "home.recentEmpty": "Todavía no hay cuentos. Toca el botón amarillo grande para hacer el primero.",
+  "home.filterAll": "Todas recientes",
+  "home.filterMine": "Sólo mías",
   "create.langStepTitle": "Elige un idioma para tu cuento.",
   "create.langStepEn": "English",
   "create.langStepSv": "Svenska (Swedish)",

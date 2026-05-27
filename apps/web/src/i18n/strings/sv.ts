@@ -13,6 +13,8 @@ export const sv: Record<StringKey, string> = {
   'home.recentHeading': 'Senaste sagorna',
   'home.recentLoading': 'Laddar senaste sagorna...',
   'home.recentEmpty': 'Inga sagor än. Tryck på den stora gula knappen för att skapa den första.',
+  'home.filterAll': 'Alla senaste',
+  'home.filterMine': 'Mina egna',
 
   // Create page chrome
   'create.langStepTitle': 'Välj ett språk för din saga.',

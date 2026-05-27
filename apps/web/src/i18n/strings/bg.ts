@@ -8,6 +8,8 @@ export const bg = {
   "home.recentHeading": "Скорошни истории",
   "home.recentLoading": "Зареждане на истории...",
   "home.recentEmpty": "Няма истории още. Натисни големия жълт бутон и направи първата.",
+  "home.filterAll": "Всички наскоро",
+  "home.filterMine": "Само мои",
   "create.langStepTitle": "Избери език за историята си.",
   "create.langStepEn": "English",
   "create.langStepSv": "Svenska (Swedish)",
