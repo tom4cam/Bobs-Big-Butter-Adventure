@@ -17,7 +17,7 @@ async function backfillOne(id: string): Promise<void> {
     console.warn(`[skip] ${id}: not found`);
     return;
   }
-  if (latest.creator_id === 'system' && latest.listed !== false) {
+  if (latest.creator_id === 'system' && latest.listed === true) {
     console.log(`[skip] ${id}: already system+listed`);
     return;
   }
