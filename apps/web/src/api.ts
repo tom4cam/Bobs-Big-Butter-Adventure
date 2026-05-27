@@ -65,6 +65,15 @@ export async function moderateText(text: string): Promise<{ flagged: boolean; re
   return jsonOrThrow(res);
 }
 
+export async function updateStoryListing(id: string, listed: boolean): Promise<StoryVersion> {
+  const res = await fetch(`${FN_BASE}/updateStoryListing`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, listed }),
+  });
+  return jsonOrThrow<StoryVersion>(res);
+}
+
 export async function deleteStory(id: string): Promise<void> {
   const res = await fetch(`${FN_BASE}/deleteStory`, {
     method: 'POST',

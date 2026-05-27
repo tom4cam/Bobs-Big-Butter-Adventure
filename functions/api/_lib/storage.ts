@@ -96,6 +96,15 @@ export async function readMedia(env: Env, key: string): Promise<{ data: ArrayBuf
   return { data, contentType };
 }
 
+// Flip the latest version's `listed` flag in-place (no new version).
+export async function setStoryListed(env: Env, id: string, listed: boolean): Promise<StoryVersion | null> {
+  const latest = await getStoryVersion(env, id);
+  if (!latest) return null;
+  const updated: StoryVersion = { ...latest, listed };
+  await saveStoryVersion(env, updated);
+  return updated;
+}
+
 // Hard-delete every blob belonging to a story.
 export async function deleteStoryAndMedia(env: Env, id: string): Promise<{ story: number; media: number }> {
   const storyList = await env.STORIES.list({ prefix: `${id}/`, limit: 1000 });
