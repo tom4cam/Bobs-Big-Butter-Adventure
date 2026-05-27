@@ -52,6 +52,7 @@ export interface StoryIndex {
   created_at: string;
   status: StoryStatus;
   creator_id?: string;
+  listed?: boolean;
 }
 
 export interface GeneratedStory {

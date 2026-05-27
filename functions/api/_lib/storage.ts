@@ -33,6 +33,8 @@ export async function saveStoryVersion(env: Env, version: StoryVersion): Promise
     updated_at: version.created_at,
     created_at: createdAt,
     status: version.status,
+    ...(version.creator_id ? { creator_id: version.creator_id } : {}),
+    ...(version.listed !== undefined ? { listed: version.listed } : {}),
   };
   await env.STORIES.put(`${version.id}/index.json`, JSON.stringify(idx), {
     httpMetadata: { contentType: 'application/json' },
@@ -69,7 +71,7 @@ export async function listStoryIndexes(env: Env): Promise<StoryIndex[]> {
     })
   );
   return items
-    .filter((x): x is StoryIndex => !!x && x.status === 'ready')
+    .filter((x): x is StoryIndex => !!x && x.status === 'ready' && x.listed !== false)
     .sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
 }
 
