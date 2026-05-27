@@ -1,11 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { en, type StringKey } from './strings/en';
 import { sv } from './strings/sv';
+import { bg } from './strings/bg';
+import { es } from './strings/es';
+import { fr } from './strings/fr';
 
 export type Lang = 'en' | 'sv' | 'bg' | 'es' | 'fr';
 const STORAGE_KEY = 'storyMaker.lang';
 
-const TABLES: Record<Lang, Record<StringKey, string>> = { en, sv, bg: en, es: en, fr: en };
+const TABLES: Record<Lang, Record<StringKey, string>> = { en, sv, bg, es, fr };
 
 export function resolveInitialLang(navigatorLang: string, stored: string | null): Lang {
   if (stored === 'en' || stored === 'sv' || stored === 'bg' || stored === 'es' || stored === 'fr') return stored;

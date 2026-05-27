@@ -14,7 +14,8 @@
     "deploy": "wrangler pages deploy",
     "seed:stories": "tsx --env-file-if-exists=.env scripts/seed-default-stories.ts",
     "seed:samples": "tsx --env-file-if-exists=.env scripts/seed-voice-samples.ts",
-    "revert": "tsx --env-file-if-exists=.env scripts/revert-story.ts"
+    "revert": "tsx --env-file-if-exists=.env scripts/revert-story.ts",
+    "translate:i18n": "tsx --env-file-if-exists=.env scripts/translate-i18n.ts"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.1053.0",
