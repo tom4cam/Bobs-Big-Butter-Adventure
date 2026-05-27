@@ -7,7 +7,10 @@ import { StoryPage } from './routes/StoryPage';
 import { EditPage } from './routes/EditPage';
 import { NotFoundPage } from './routes/NotFoundPage';
 import { LangProvider } from './i18n';
+import { getCreatorId } from './creatorId';
 import './styles.css';
+
+getCreatorId(); // ensure the cookie+localStorage are seeded on first visit
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
