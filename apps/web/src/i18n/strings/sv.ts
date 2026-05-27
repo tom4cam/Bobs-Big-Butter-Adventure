@@ -76,6 +76,9 @@ export const sv: Record<StringKey, string> = {
   'story.deleteYes': 'Ja, ta bort',
   'story.deleteNo': 'Behåll den',
   'story.deleteFailed': 'Det gick inte att ta bort sagan. Försök igen.',
+  'story.listed': 'Visas på startsidan',
+  'story.unlisted': 'Dold från startsidan',
+  'story.listingFailed': 'Det gick inte att uppdatera — försök igen.',
 
   // Edit page
   'edit.loading': 'Laddar sagan...',

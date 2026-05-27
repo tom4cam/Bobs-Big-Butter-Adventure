@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { AudioBar, type AudioBarRef } from '../components/AudioBar';
-import { deleteStory, getStory } from '../api';
+import { deleteStory, getStory, updateStoryListing } from '../api';
+import { getCreatorId } from '../creatorId';
 import { useAudioSync } from '../audioSync';
 import { useLang, useT } from '../i18n';
 import { LOCALES } from '../i18n/locales';
@@ -25,6 +26,10 @@ export function StoryPage() {
   const audioRef = useRef<AudioBarRef | null>(null);
   const activeIndex = useAudioSync(audioRef, story?.narration_words);
   const lastScrolledParaRef = useRef<number>(-1);
+  const myId = getCreatorId();
+  const isOwner = !!story?.creator_id && story.creator_id !== 'system' && story.creator_id === myId;
+  const [listed, setListedLocal] = useState<boolean>(story?.listed !== false);
+  const [listingError, setListingError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -75,6 +80,11 @@ export function StoryPage() {
     const el = document.querySelector<HTMLElement>(`[data-para="${para}"]`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [activeIndex, story?.narration_words]);
+
+  // Sync listed state whenever the story changes.
+  useEffect(() => {
+    if (story) setListedLocal(story.listed !== false);
+  }, [story?.id, story?.listed]);
 
   if (loading) {
     return (
@@ -171,15 +181,35 @@ export function StoryPage() {
         <Link to="/create" className="btn">{t('story.makeAnother')}</Link>
       </div>
 
-      {!confirmingDelete && (
+      {isOwner && !confirmingDelete && (
         <div className="row no-print" style={{ justifyContent: 'center', marginTop: 16 }}>
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={async () => {
+              if (!story) return;
+              const next = !listed;
+              setListedLocal(next);
+              setListingError(null);
+              try {
+                await updateStoryListing(story.id, next);
+              } catch (e) {
+                setListedLocal(!next);
+                setListingError(`${t('story.listingFailed')} (${(e as Error).message})`);
+              }
+            }}
+          >
+            {listed ? t('story.listed') : t('story.unlisted')}
+          </button>
           <button type="button" className="btn danger-ghost" onClick={() => setConfirmingDelete(true)}>
             {t('story.delete')}
           </button>
         </div>
       )}
 
-      {confirmingDelete && (
+      {listingError && <div className="error">{listingError}</div>}
+
+      {isOwner && confirmingDelete && (
         <div className="card delete-confirm no-print" style={{ marginTop: 16 }}>
           <div className="question">{t('story.deleteConfirmTitle')}</div>
           <p>{t('story.deleteConfirmBody')}</p>

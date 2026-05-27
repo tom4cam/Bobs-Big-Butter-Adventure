@@ -74,6 +74,9 @@ export const en = {
   'story.deleteYes': 'Yes, delete it',
   'story.deleteNo': 'Keep it',
   'story.deleteFailed': 'Could not delete the story. Try again.',
+  'story.listed': 'Listed on home page',
+  'story.unlisted': 'Hidden from home page',
+  'story.listingFailed': "Couldn't update — try again.",
 
   // Edit page
   'edit.loading': 'Loading the story...',
