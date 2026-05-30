@@ -24,7 +24,11 @@ export function Layout({ children, showExit = false }: Props) {
         <Link to="/" className="brand">
           <BookLogo size={44} className="brand-logo" />
           <span className="brand-text">
-            {t('brand.name')}
+            <span className="brand-word">
+              {Array.from(t('brand.name')).map((ch, i) => (
+                <span key={i} className={`brand-letter brand-letter--${i % 3}`}>{ch}</span>
+              ))}
+            </span>
             <small>{t('brand.tagline')}</small>
           </span>
         </Link>

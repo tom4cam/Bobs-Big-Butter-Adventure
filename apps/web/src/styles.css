@@ -63,6 +63,10 @@ a:hover { text-decoration: underline; }
 .brand-logo { flex: 0 0 auto; }
 .brand-text { display: inline-flex; flex-direction: column; line-height: 1.05; }
 .brand-text small { color: var(--ink-soft); font-size: 13px; font-weight: 600; margin-top: 2px; }
+.brand-word { display: block; }
+.brand-letter--0 { color: var(--accent-deep); }
+.brand-letter--1 { color: var(--leaf-deep); }
+.brand-letter--2 { color: var(--ink); }
 @media (max-width: 480px) {
   .brand-logo { width: 36px; height: 36px; }
 }
@@ -78,7 +82,7 @@ a:hover { text-decoration: underline; }
 }
 
 .hero h1 {
-  font-size: 34px;
+  font-size: 26px;
   line-height: 1.15;
   margin: 0 0 12px;
 }
