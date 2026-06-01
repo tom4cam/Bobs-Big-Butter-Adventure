@@ -700,15 +700,34 @@ ul.answer-list li b { color: var(--ink-soft); }
 .flag-row {
   display: inline-flex;
   align-items: baseline;
-  gap: 4px;
-  margin-top: 4px;
-  font-size: 16px;
+  gap: 8px;
+  margin-top: 6px;
   line-height: 1;
 }
-.flag-row .flag { opacity: 0.6; font-size: 16px; }
-.flag-row .flag--current { opacity: 1; font-size: 22px; }
+.flag-row .flag { opacity: 0.6; font-size: 28px; }
+.flag-row .flag--current { opacity: 1; font-size: 40px; }
 .flag-row a.flag {
   text-decoration: none;
   cursor: pointer;
 }
 .flag-row a.flag:hover { opacity: 1; }
+
+/* Header lang toggle (next to the cog) */
+.header-row { display: inline-flex; align-items: center; gap: 8px; }
+.lang-btn {
+  background: var(--paper);
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  width: 48px; height: 48px;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  padding: 0;
+  font-family: inherit;
+}
+.lang-btn:hover { background: var(--accent-soft); }
+.lang-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,24,88,0.12); }

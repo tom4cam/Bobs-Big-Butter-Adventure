@@ -1,8 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
-import { useT } from '../i18n';
+import { useT, useLang } from '../i18n';
 import { SettingsCog } from './SettingsCog';
 import { BookLogo } from './BookLogo';
+import { LANG_FLAG } from '../lang';
 
 interface Props {
   children: ReactNode;
@@ -11,12 +12,15 @@ interface Props {
 
 export function Layout({ children, showExit = false }: Props) {
   const t = useT();
+  const { lang: uiLang, setLang } = useLang();
   const navigate = useNavigate();
 
   const goBack = () => {
     if (window.history.length > 1) navigate(-1);
     else navigate('/');
   };
+
+  const toggleLang = () => setLang(uiLang === 'en' ? 'sv' : 'en');
 
   return (
     <div className="page">
@@ -44,7 +48,18 @@ export function Layout({ children, showExit = false }: Props) {
               <span aria-hidden="true">{'←'}</span> {t('nav.back')}
             </button>
           )}
-          <SettingsCog />
+          <div className="header-row">
+            <button
+              type="button"
+              className="lang-btn"
+              onClick={toggleLang}
+              aria-label={t('settings.language')}
+              title={t('settings.language')}
+            >
+              {LANG_FLAG[uiLang]}
+            </button>
+            <SettingsCog />
+          </div>
         </div>
       </div>
       {children}
