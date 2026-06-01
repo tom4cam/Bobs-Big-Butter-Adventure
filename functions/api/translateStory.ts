@@ -7,7 +7,7 @@
 import type { Env } from './_lib/env';
 import { translateStory as runTranslation } from './_lib/anthropic';
 import { buildAndSaveVersion } from './_lib/build';
-import { getStoryVersion } from './_lib/storage';
+import { getStoryVersion, saveStoryVersion } from './_lib/storage';
 import { readCreatorId } from './_lib/creatorId';
 import { LANGS, type Lang } from './_lib/types';
 import { badRequest, json, serverError } from './_lib/util';
@@ -41,6 +41,14 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     const creator_id = readCreatorId(request) ?? source.creator_id ?? undefined;
     const newId = crypto.randomUUID();
+    const groupId = source.group_id ?? source.id;
+
+    // Back-stamp the source so it joins the same group as the new translation.
+    // Without this, the source stays group_id=null and lands in a different
+    // bucket on the home page, defeating the whole point of grouping.
+    if (!source.group_id) {
+      await saveStoryVersion(env, { ...source, group_id: groupId });
+    }
 
     const newVersion = await buildAndSaveVersion(env, {
       id: newId,
@@ -51,7 +59,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       voiceId: source.voice_id,
       creator_id,
       listed: true,
-      group_id: source.group_id ?? source.id,
+      group_id: groupId,
       paragraphs: source.paragraphs.map((p, i) => ({
         text: translated.paragraphs[i],
         image_prompt: p.image_prompt,
