@@ -1,10 +1,11 @@
 // POST /api/updateStory
-// Writes a new "generating" version stub, kicks off the build via
-// ctx.waitUntil, returns 202.
+// Owners (cookie matches story creator_id): overwrites the current version in place.
+// Non-owners: writes a new "generating" version stub, builds, returns the new version.
 
 import type { Env } from './_lib/env';
 import { buildAndSaveVersion, saveFailedVersion, saveGeneratingStub } from './_lib/build';
 import { getStoryIndex, getStoryVersion } from './_lib/storage';
+import { readCreatorId } from './_lib/creatorId';
 import { badRequest, json, notFound, serverError } from './_lib/util';
 
 interface UpdateStoryRequest {
@@ -26,20 +27,28 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const previous = await getStoryVersion(env, body.id, idx.latest_version);
   if (!previous) return notFound('That story version is missing.');
 
+  const cookieId = readCreatorId(request);
+  const isOwner = !!cookieId && !!previous.creator_id && cookieId === previous.creator_id;
+  const targetVersion = isOwner ? idx.latest_version : idx.latest_version + 1;
+
   const language = previous.language ?? 'en';
   const voiceId = previous.voice_id;
   const summary = typeof body.summary === 'string' ? body.summary : (previous.summary ?? '');
-  const nextVersion = idx.latest_version + 1;
 
-  try {
-    await saveGeneratingStub(env, {
-      id: body.id, version: nextVersion,
-      sourceAnswers: previous.source_answers ?? [],
-      language, voiceId,
-    });
-  } catch (e) {
-    console.error('updateStory stub failed', e);
-    return serverError((e as Error).message);
+  // Non-owners get the existing "generating stub" UX so the home page reflects
+  // an in-flight new version. Owners edit in place; the previous ready version
+  // stays valid until the new one overwrites it on success.
+  if (!isOwner) {
+    try {
+      await saveGeneratingStub(env, {
+        id: body.id, version: targetVersion,
+        sourceAnswers: previous.source_answers ?? [],
+        language, voiceId,
+      });
+    } catch (e) {
+      console.error('updateStory stub failed', e);
+      return serverError((e as Error).message);
+    }
   }
 
   const title = body.title || idx.title;
@@ -53,18 +62,35 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   try {
     const story = await buildAndSaveVersion(env, {
-      id: body.id, version: nextVersion, title,
-      sourceAnswers, language, voiceId, summary, paragraphs,
+      id: body.id,
+      version: targetVersion,
+      title,
+      sourceAnswers,
+      language,
+      voiceId,
+      summary,
+      paragraphs,
+      creator_id: previous.creator_id,
+      listed: previous.listed,
+      group_id: previous.group_id,
+      rhyme: previous.rhyme,
     });
     return json(story, 200);
   } catch (e) {
     console.error('update build failed', e);
-    try {
-      await saveFailedVersion(env, {
-        id: body.id, version: nextVersion, sourceAnswers, language, voiceId,
-        error: `Something went wrong while saving the new version: ${(e as Error).message}`,
-      });
-    } catch (saveErr) { console.error('Could not record failure state', saveErr); }
+    // Only record a failed version when we were creating a new one. For
+    // in-place owner edits, the previous version remains intact on error.
+    if (!isOwner) {
+      try {
+        await saveFailedVersion(env, {
+          id: body.id, version: targetVersion, sourceAnswers, language, voiceId,
+          creator_id: previous.creator_id,
+          listed: previous.listed,
+          group_id: previous.group_id,
+          error: `Something went wrong while saving the new version: ${(e as Error).message}`,
+        });
+      } catch (saveErr) { console.error('Could not record failure state', saveErr); }
+    }
     return serverError((e as Error).message);
   }
 };

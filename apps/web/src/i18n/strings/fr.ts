@@ -90,6 +90,8 @@ export const fr = {
   "edit.regenerateImage": "Refaire cette image quand j'enregistre",
   "edit.cancel": "Annuler",
   "edit.save": "Enregistrer comme nouvelle version",
+  "edit.saveInPlace": "Enregistrer",
+  "edit.savingInPlace": "Cela mettra à jour l'histoire sans créer de nouvelle version.",
   "notFound.title": "Cette page s'est perdue dans la forêt.",
   "notFound.body": "Retournons choisir un autre chemin.",
   "mic.start": "Dis ta réponse",

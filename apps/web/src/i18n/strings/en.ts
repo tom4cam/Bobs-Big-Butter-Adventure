@@ -113,6 +113,8 @@ export const en = {
   'edit.regenerateImage': 'Regenerate this picture when I save',
   'edit.cancel': 'Cancel',
   'edit.save': 'Save as new version',
+  'edit.saveInPlace': 'Save edits',
+  'edit.savingInPlace': 'Saving will update this story in place (no new version).',
 
   // Not found page
   'notFound.title': 'That page got lost in the woods.',

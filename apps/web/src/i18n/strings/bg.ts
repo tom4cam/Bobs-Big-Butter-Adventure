@@ -90,6 +90,8 @@ export const bg = {
   "edit.regenerateImage": "Преначертай тази картинка при запазване",
   "edit.cancel": "Отказ",
   "edit.save": "Запази като нова версия",
+  "edit.saveInPlace": "Запази промените",
+  "edit.savingInPlace": "Това ще актуализира историята на място (без нова версия).",
   "notFound.title": "Тази страница се изгуби в гората.",
   "notFound.body": "Да се върнем и изберем друг път.",
   "mic.start": "Кажи отговора си",

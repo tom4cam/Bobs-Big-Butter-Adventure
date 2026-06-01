@@ -103,6 +103,8 @@ export const sv: Record<StringKey, string> = {
   'edit.regenerateImage': 'Rita om bilden när jag sparar',
   'edit.cancel': 'Avbryt',
   'edit.save': 'Spara som ny version',
+  'edit.saveInPlace': 'Spara ändringar',
+  'edit.savingInPlace': 'Detta uppdaterar sagan på plats (ingen ny version).',
 
   // Not found page
   'notFound.title': 'Den sidan tappade bort sig i skogen.',

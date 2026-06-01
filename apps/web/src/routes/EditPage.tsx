@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { getStory, updateStory } from '../api';
 import { useT } from '../i18n';
+import { getCreatorId } from '../creatorId';
 import type { Paragraph, StoryVersion } from '../types';
 
 interface DraftParagraph extends Paragraph {
@@ -34,6 +35,11 @@ export function EditPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const isOwner = useMemo(
+    () => !!story?.creator_id && getCreatorId() === story.creator_id,
+    [story],
+  );
+
   const updateParagraph = (i: number, patch: Partial<DraftParagraph>) => {
     setParagraphs((prev) => prev.map((p, idx) => (idx === i ? { ...p, ...patch } : p)));
   };
@@ -54,7 +60,7 @@ export function EditPage() {
         title,
         summary
       );
-      navigate(`/s/${next.id}/v/${next.version}`);
+      navigate(isOwner ? `/s/${next.id}` : `/s/${next.id}/v/${next.version}`);
     } catch (e) {
       setSaving(false);
       setError((e as Error).message);
@@ -81,7 +87,9 @@ export function EditPage() {
   return (
     <Layout>
       <h1 className="story-title">{t('edit.heading')}</h1>
-      <p className="story-meta">{t('edit.versionNote', { next: String(story.version + 1) })}</p>
+      <p className="story-meta">
+        {isOwner ? t('edit.savingInPlace') : t('edit.versionNote', { next: String(story.version + 1) })}
+      </p>
 
       <div className="card">
         <label className="question" htmlFor="title">{t('edit.titleLabel')}</label>
@@ -129,7 +137,9 @@ export function EditPage() {
 
       <div className="row" style={{ justifyContent: 'center', marginTop: 24 }}>
         <Link to={`/s/${story.id}`} className="btn ghost">{t('edit.cancel')}</Link>
-        <button type="button" className="btn sun" onClick={save}>{t('edit.save')}</button>
+        <button type="button" className="btn sun" onClick={save}>
+          {isOwner ? t('edit.saveInPlace') : t('edit.save')}
+        </button>
       </div>
     </Layout>
   );

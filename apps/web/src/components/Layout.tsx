@@ -63,7 +63,12 @@ export function Layout({ children, showExit = false }: Props) {
         </div>
       </div>
       {children}
-      <div className="footer">{t('dedication.line')}</div>
+      <div className="footer">
+        {t('dedication.line')}{' · '}
+        <a href="https://github.com/tom4cam/Story-Maker" target="_blank" rel="noopener noreferrer">
+          Source on GitHub
+        </a>
+      </div>
     </div>
   );
 }

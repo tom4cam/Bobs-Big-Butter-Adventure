@@ -90,6 +90,8 @@ export const es = {
   "edit.regenerateImage": "Volver a crear esta imagen al guardar",
   "edit.cancel": "Cancelar",
   "edit.save": "Guardar como nueva versión",
+  "edit.saveInPlace": "Guardar cambios",
+  "edit.savingInPlace": "Esto actualizará el cuento sin crear una nueva versión.",
   "notFound.title": "Esta página se perdió en el bosque.",
   "notFound.body": "Volvamos y elijamos otro camino.",
   "mic.start": "Di tu respuesta",
