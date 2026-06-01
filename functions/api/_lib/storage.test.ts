@@ -29,6 +29,7 @@ describe('groupStoryIndexes', () => {
       group_id: null,
       primary: s,
       languages: ['en'],
+      members: [{ id: 'solo', language: 'en' }],
     });
   });
 
