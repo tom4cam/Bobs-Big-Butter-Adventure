@@ -1,4 +1,4 @@
-// Generates four short MP3 samples for the voice picker.
+// Generates six short MP3 samples for the voice picker.
 // Run once after deploy, then commit the resulting files:
 //
 //   npm run seed:samples
@@ -23,6 +23,8 @@ const SAMPLES: SampleSpec[] = [
   { key: 'rachel', voiceId: 'nova',    text: "Hi, I'm Rachel. I love telling stories." },
   { key: 'sanna',  voiceId: 'shimmer', text: 'Hej, jag heter Sanna. Jag älskar att berätta sagor.' },
   { key: 'adam',   voiceId: 'echo',    text: 'Hej, jag heter Adam. Jag älskar att berätta sagor.' },
+  { key: 'ava',    voiceId: 'alloy',   text: "Hi, I'm Ava. I love telling stories." },
+  { key: 'oliver', voiceId: 'fable',   text: "Hi, I'm Oliver. I love telling stories." },
 ];
 
 const OUTPUT_DIR = resolve(__dirname, '../apps/web/public/voice-samples');

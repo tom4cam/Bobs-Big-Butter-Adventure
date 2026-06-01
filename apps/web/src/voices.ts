@@ -2,7 +2,7 @@ import type { Lang } from './types';
 export type { Lang } from './types';
 
 export interface VoiceMeta {
-  key: 'daniel' | 'rachel' | 'sanna' | 'adam';
+  key: 'daniel' | 'rachel' | 'sanna' | 'adam' | 'ava' | 'oliver';
   displayName: string;
   gender: 'm' | 'f';
   voiceId: string;
@@ -18,6 +18,8 @@ export const VOICES: VoiceMeta[] = [
   { key: 'rachel', displayName: 'Rachel', gender: 'f', voiceId: 'nova',    sampleUrl: '/voice-samples/rachel.mp3' },
   { key: 'sanna',  displayName: 'Sanna',  gender: 'f', voiceId: 'shimmer', sampleUrl: '/voice-samples/sanna.mp3'  },
   { key: 'adam',   displayName: 'Adam',   gender: 'm', voiceId: 'echo',    sampleUrl: '/voice-samples/adam.mp3'   },
+  { key: 'ava',    displayName: 'Ava',    gender: 'f', voiceId: 'alloy',   sampleUrl: '/voice-samples/ava.mp3'    },
+  { key: 'oliver', displayName: 'Oliver (British)', gender: 'm', voiceId: 'fable', sampleUrl: '/voice-samples/oliver.mp3' },
 ];
 
 export function defaultVoiceFor(_language: Lang): VoiceMeta {
