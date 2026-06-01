@@ -19,6 +19,7 @@
     "backfill:system": "tsx --env-file-if-exists=.env scripts/backfill-system-stories.ts",
     "cleanup:media": "tsx --env-file-if-exists=.env scripts/cleanup-orphaned-media.ts",
     "backfill:index-language": "tsx --env-file-if-exists=.env scripts/backfill-index-language.ts",
+    "backfill:groups": "tsx --env-file-if-exists=.env scripts/backfill-groups.ts",
     "take-ownership": "tsx --env-file-if-exists=.env scripts/take-ownership.ts"
   },
   "devDependencies": {
