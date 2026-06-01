@@ -175,7 +175,7 @@ export async function buildFromAnswers(
   });
 }
 
-async function safelyGenerate(env: Env, answers: StoryAnswer[], language: 'en' | 'sv' | 'bg' | 'es' | 'fr'): Promise<GeneratedStory> {
+async function safelyGenerate(env: Env, answers: StoryAnswer[], language: Lang): Promise<GeneratedStory> {
   const generated = await generateStory(env, answers, language);
   const fullText = `${generated.title}\n\n${generated.paragraphs.map((p) => p.text).join('\n\n')}`;
   const result = await moderate(env, fullText);

@@ -1,7 +1,11 @@
 // Mirror of apps/web/src/types.ts — kept here so functions are
 // self-contained for the Cloudflare bundler.
 
-export const LANGS = ['en', 'sv', 'bg', 'es', 'fr'] as const;
+export const LANGS = [
+  'en', 'sv', 'bg', 'es', 'fr',
+  'mk',
+  'pt-BR', 'pt-PT',
+] as const;
 export type Lang = typeof LANGS[number];
 
 export interface Paragraph {

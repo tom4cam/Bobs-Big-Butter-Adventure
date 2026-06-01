@@ -1,6 +1,13 @@
 // Shared types used by both the web app and the Netlify functions.
 // These mirror the JSON shapes returned by the API.
 
+export const LANGS = [
+  'en', 'sv', 'bg', 'es', 'fr',
+  'mk',
+  'pt-BR', 'pt-PT',
+] as const;
+export type Lang = typeof LANGS[number];
+
 export interface Paragraph {
   text: string;
   image_url: string | null;
@@ -32,7 +39,7 @@ export interface StoryVersion {
   created_at: string;
   status: StoryStatus;
   error?: string;
-  language: 'en' | 'sv' | 'bg' | 'es' | 'fr';
+  language: Lang;
   narration_words?: WordTiming[];
   voice_id?: string;
   summary?: string;

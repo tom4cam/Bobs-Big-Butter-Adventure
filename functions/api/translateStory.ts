@@ -26,7 +26,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   catch (e) { return badRequest((e as Error).message || 'Bad JSON'); }
   if (!body.id || typeof body.id !== 'string') return badRequest('id required');
   const target = body.target_language as Lang;
-  if (!VALID_LANGS.has(target)) return badRequest('target_language must be en, sv, bg, es, or fr');
+  if (!VALID_LANGS.has(target)) return badRequest(`target_language must be one of: ${LANGS.join(', ')}`);
 
   try {
     const source = await getStoryVersion(env, body.id, body.version);
