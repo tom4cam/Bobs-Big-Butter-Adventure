@@ -938,6 +938,236 @@ git commit -m "Add inline language switcher on the story page"
 
 ---
 
+### Task 10: Expand voice picker to 6 OpenAI voices (incl. British)
+
+Expose all six OpenAI tts-1 voices in the picker, including `fable` for a British accent. Add two new sample MP3s for the new voices.
+
+**Files:**
+- Modify: `apps/web/src/voices.ts` (extend `VOICES` and the `key` union)
+- Modify: `scripts/seed-voice-samples.ts` (add `SAMPLES` entries for the new keys)
+- Create: `apps/web/public/voice-samples/ava.mp3`, `apps/web/public/voice-samples/oliver.mp3` (run the seed script to generate)
+
+- [ ] **Step 1: Update voices.ts**
+
+Edit `apps/web/src/voices.ts`. Change the key union and the catalog:
+
+```ts
+export interface VoiceMeta {
+  key: 'daniel' | 'rachel' | 'sanna' | 'adam' | 'ava' | 'oliver';
+  displayName: string;
+  gender: 'm' | 'f';
+  voiceId: string;
+  sampleUrl: string;
+}
+
+export const VOICES: VoiceMeta[] = [
+  { key: 'daniel', displayName: 'Daniel', gender: 'm', voiceId: 'onyx',    sampleUrl: '/voice-samples/daniel.mp3' },
+  { key: 'rachel', displayName: 'Rachel', gender: 'f', voiceId: 'nova',    sampleUrl: '/voice-samples/rachel.mp3' },
+  { key: 'sanna',  displayName: 'Sanna',  gender: 'f', voiceId: 'shimmer', sampleUrl: '/voice-samples/sanna.mp3'  },
+  { key: 'adam',   displayName: 'Adam',   gender: 'm', voiceId: 'echo',    sampleUrl: '/voice-samples/adam.mp3'   },
+  { key: 'ava',    displayName: 'Ava',    gender: 'f', voiceId: 'alloy',   sampleUrl: '/voice-samples/ava.mp3'    },
+  { key: 'oliver', displayName: 'Oliver (British)', gender: 'm', voiceId: 'fable', sampleUrl: '/voice-samples/oliver.mp3' },
+];
+```
+
+- [ ] **Step 2: Update seed-voice-samples.ts**
+
+Edit the `SAMPLES` array in `scripts/seed-voice-samples.ts` and append:
+
+```ts
+{ key: 'ava',    voiceId: 'alloy', text: "Hi, I'm Ava. I love telling stories." },
+{ key: 'oliver', voiceId: 'fable', text: "Hi, I'm Oliver. I love telling stories." },
+```
+
+- [ ] **Step 3: Inspect VoicePicker for layout assumptions**
+
+Run: `cat apps/web/src/components/VoicePicker.tsx`. Confirm the component renders `VOICES.map(...)` (or iterates the catalog) and doesn't hard-code "4 slots". If it does, generalize so 6 entries render cleanly. Tweak `apps/web/src/styles.css` if the picker grid needs to flex.
+
+- [ ] **Step 4: Generate the two new sample MP3s**
+
+Run: `npm run seed:samples`
+Expected: prints `Generating ava...` and `Generating oliver...` and writes the two new files. The pre-existing four are overwritten with identical content (idempotent).
+
+- [ ] **Step 5: Typecheck + tests**
+
+Run: `npm run typecheck && npm --workspace apps/web run test`
+Expected: pass.
+
+- [ ] **Step 6: Spot-check the new samples in the dev server**
+
+Run: `npm --workspace apps/web run dev` and open the create page → voice picker step. Verify all six voices play; `Oliver (British)` sounds British.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add apps/web/src/voices.ts scripts/seed-voice-samples.ts apps/web/public/voice-samples/
+git commit -m "Add Ava (alloy) and Oliver (British, fable) to the voice picker"
+```
+
+---
+
+### Task 11: Yes/no rhyme step on the create flow
+
+Add a per-story "Should it rhyme?" step before the question sequence. Thread `rhyme: boolean` through `/api/createStory` into the Anthropic prompt so the model writes rhyming verse when requested. Persist the choice on the version for traceability.
+
+**Files:**
+- Modify: `functions/api/_lib/types.ts` and `apps/web/src/types.ts` (StoryVersion `rhyme?: boolean`)
+- Modify: `functions/api/createStory.ts` (parse `rhyme` from body, forward into the build options)
+- Modify: `functions/api/_lib/build.ts` (BuildOptions accepts `rhyme`, passes to generateStory)
+- Modify: `functions/api/_lib/anthropic.ts` (`generateStory` takes `rhyme: boolean`, alters prompt)
+- Modify: `apps/web/src/routes/CreatePage.tsx` (new `rhyme` step in the flow)
+- Modify: `apps/web/src/api.ts` (`createStory` helper takes the new flag)
+- Modify: `apps/web/src/i18n/strings/{en,sv,bg,es,fr}.ts` (`rhyme.stepTitle`, `rhyme.yes`, `rhyme.no`)
+
+Translations do NOT carry rhyme — translating rhyming verse with Anthropic doesn't reliably preserve rhyme in the target language. The `rhyme` flag is creation-time only.
+
+- [ ] **Step 1: Add `rhyme?: boolean` to StoryVersion (both type files)**
+
+Edit `functions/api/_lib/types.ts` and `apps/web/src/types.ts`. In `StoryVersion`, append after `summary?: string`:
+
+```ts
+  rhyme?: boolean;       // NEW — set when the story was generated in rhyming style
+```
+
+- [ ] **Step 2: Update Anthropic generateStory signature + prompt**
+
+Edit `functions/api/_lib/anthropic.ts`. Change the signature:
+
+```ts
+export async function generateStory(env: Env, answers: StoryAnswer[], language: Lang, rhyme: boolean): Promise<GeneratedStory> {
+```
+
+In the prompt assembly (look for where `languageInstruction` is built), add:
+
+```ts
+const rhymeInstruction = rhyme
+  ? 'Write every paragraph as a short rhyming verse in simple AABB couplets suitable for ages 3-6. Keep the rhymes natural — do not stretch the sentence just to force a rhyme.'
+  : 'Write in clear, warm prose suitable for ages 3-6.';
+```
+
+Splice `rhymeInstruction` into the system/user prompt alongside the existing language instruction.
+
+- [ ] **Step 3: Thread rhyme through build.ts**
+
+Edit `functions/api/_lib/build.ts`. In `BuildOptions`, add:
+
+```ts
+  rhyme?: boolean;
+```
+
+In `safelyGenerate` (the helper that calls `generateStory`), change the signature to accept `rhyme: boolean` and pass it on. In `buildAndSaveVersion`, pass `opts.rhyme ?? false` to `safelyGenerate` and include it in the saved StoryVersion record (mirroring the `summary` / `creator_id` pattern):
+
+```ts
+...(opts.rhyme ? { rhyme: true } : {}),
+```
+
+- [ ] **Step 4: Update createStory endpoint**
+
+Edit `functions/api/createStory.ts`. Add to the request body shape:
+
+```ts
+interface CreateRequest {
+  answers: StoryAnswer[];
+  language: Lang;
+  voice_id?: string;
+  rhyme?: boolean;       // NEW
+}
+```
+
+In the handler, validate and forward:
+
+```ts
+const rhyme = typeof body.rhyme === 'boolean' ? body.rhyme : false;
+// ... pass `rhyme` into the buildAndSaveVersion call's options.
+```
+
+- [ ] **Step 5: Update createStory frontend helper**
+
+Edit `apps/web/src/api.ts`. The `createStory` function gains a `rhyme: boolean` parameter at the call site (default false at the parameter level is fine):
+
+```ts
+export async function createStory(answers: StoryAnswer[], language: Lang, voiceId?: string, rhyme = false): Promise<StoryVersion> {
+  const res = await fetch('/api/createStory', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answers, language, voice_id: voiceId, rhyme }),
+  });
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+  return res.json();
+}
+```
+
+(Adjust the existing function's body to match — keep the existing imports/auth pattern intact.)
+
+- [ ] **Step 6: Add the rhyme step to CreatePage**
+
+Edit `apps/web/src/routes/CreatePage.tsx`. Extend the `StepKind` union to include `'rhyme'`:
+
+```ts
+type StepKind = 'lang' | 'opener' | 'voice' | 'rhyme' | 'q';
+```
+
+Add component state and a step UI. The simplest place to insert it is between the voice step and the first question — after the voice picker's Next, instead of jumping straight to `setStepKind('q')`, jump to `setStepKind('rhyme')`. The rhyme step renders two big chip-style buttons (Yes / No), and selecting one sets `setRhyme(true | false)` then `setStepKind('q')`.
+
+```tsx
+const [rhyme, setRhyme] = useState(false);
+
+// ... in the step rendering block, after the voice branch ...
+if (stepKind === 'rhyme') {
+  return (
+    <Layout showExit>
+      <div className="step">
+        <div className="question">{t('rhyme.stepTitle')}</div>
+        <div className="chips">
+          <button type="button" className="btn sun" onClick={() => { setRhyme(true);  setStepKind('q'); }}>
+            {t('rhyme.yes')}
+          </button>
+          <button type="button" className="btn ghost" onClick={() => { setRhyme(false); setStepKind('q'); }}>
+            {t('rhyme.no')}
+          </button>
+        </div>
+      </div>
+    </Layout>
+  );
+}
+```
+
+In the `createStory(payload, storyLang, voiceMeta.voiceId)` call, pass `rhyme`:
+
+```tsx
+const story = await createStory(payload, storyLang, voiceMeta.voiceId, rhyme);
+```
+
+In the voice step's "Next" handler, change the transition target from `'q'` to `'rhyme'`.
+
+- [ ] **Step 7: Add i18n strings**
+
+Add to every locale file under `apps/web/src/i18n/strings/`:
+
+```ts
+'rhyme.stepTitle': 'Should your story rhyme?',
+'rhyme.yes': 'Yes, make it rhyme',
+'rhyme.no': 'No, regular story',
+```
+
+Translate per locale. The English versions above are the source of truth; for other locales, use the same wording as the rest of the file's tone. If unsure, leave the English text — better than a wrong translation; the user can fix later.
+
+- [ ] **Step 8: Typecheck + tests**
+
+Run: `npm run typecheck && npm --workspace apps/web run test`
+Expected: pass.
+
+- [ ] **Step 9: Commit**
+
+```bash
+git add functions/api/_lib/types.ts functions/api/_lib/anthropic.ts functions/api/_lib/build.ts \
+        functions/api/createStory.ts apps/web/src/types.ts apps/web/src/api.ts \
+        apps/web/src/routes/CreatePage.tsx apps/web/src/i18n/strings/
+git commit -m "Add rhyme yes/no step to the create flow"
+```
+
+---
+
 ### Task 9: End-to-end verification + deploy
 
 Final manual sanity pass and ship.
