@@ -7,12 +7,19 @@ import { HelpYesNo } from '../components/HelpYesNo';
 import { ApiError, createStory, moderateText } from '../api';
 import { cancelSpeech, speakBest, stopAskVoice } from '../speech';
 import { useLang, useT } from '../i18n';
-import type { Lang } from '../i18n';
+import type { Lang } from '../types';
 import { usePrefs } from '../prefs';
 import { defaultVoiceFor, findVoiceByKey, VOICES } from '../voices';
 import { QUESTION_HELPERS } from '../createHelpers';
+import { LANGS } from '../types';
 import type { StoryAnswer } from '../types';
 import type { StringKey } from '../i18n/strings/en';
+
+function langKey(code: string): string {
+  return code.split('-')
+    .map((seg) => seg.charAt(0).toUpperCase() + seg.slice(1).toLowerCase())
+    .join('');
+}
 
 interface Question {
   id: string;
@@ -117,14 +124,14 @@ export function CreatePage() {
         <div className="card">
           <div className="question">{t('create.langStepTitle')}</div>
           <div className="lang-grid" style={{ marginTop: 16 }}>
-            {(['en','sv','bg','es','fr'] as const).map((code) => (
+            {LANGS.map((code) => (
               <button
                 key={code}
                 type="button"
                 className={`btn${uiLang === code ? ' sun' : ''}`}
                 onClick={() => { setStoryLang(code); setVoiceKey(defaultVoiceFor(code).key); setStepKind('opener'); }}
               >
-                {t(`create.langStep${code[0].toUpperCase()}${code[1]}` as 'create.langStepEn')}
+                {t(`create.langStep${langKey(code)}` as 'create.langStepEn')}
               </button>
             ))}
           </div>
@@ -361,7 +368,7 @@ export function CreatePage() {
           <div style={{ marginTop: 16 }}>
             <HelpYesNo
               tree={helpers.tree}
-              language={storyLang}
+              language={uiLang}
               onAnswer={(text) => {
                 setCurrent((c) => (c ? c + ' ' + text : text));
                 setHelping(null);

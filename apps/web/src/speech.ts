@@ -32,8 +32,10 @@ export function cancelSpeech() {
 const askCache = new Map<string, Blob>();
 let askAudio: HTMLAudioElement | null = null;
 
+import type { Lang } from './types';
+
 export interface AskVoiceOpts {
-  language: 'en' | 'sv' | 'bg' | 'es' | 'fr';
+  language: Lang;
   voiceId: string;
   speed?: number;
 }

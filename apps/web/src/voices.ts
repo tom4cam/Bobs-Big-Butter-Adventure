@@ -1,4 +1,5 @@
-export type Lang = 'en' | 'sv' | 'bg' | 'es' | 'fr';
+import type { Lang } from './types';
+export type { Lang } from './types';
 
 export interface VoiceMeta {
   key: 'daniel' | 'rachel' | 'sanna' | 'adam';

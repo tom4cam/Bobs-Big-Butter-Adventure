@@ -1,5 +1,5 @@
 // POST /api/translateStory
-// Body: { id: string, version?: number, target_language: 'en'|'sv'|'bg'|'es'|'fr' }
+// Body: { id: string, version?: number, target_language: Lang }
 // Returns a brand-new StoryVersion (its own id) in the target language,
 // reusing the source story's images and original voice id. Re-synthesizes
 // narration in the target language.

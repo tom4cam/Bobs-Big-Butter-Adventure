@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { LOCALES } from '../i18n/locales';
 import { listenOnce, speechRecognitionAvailable, type ListenHandle } from '../speech';
+import type { Lang } from '../types';
 
 interface Props {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   ariaLabel: string;
-  language: 'en' | 'sv' | 'bg' | 'es' | 'fr';
+  language: Lang;
 }
 
 export function MicInput({ value, onChange, placeholder, ariaLabel, language }: Props) {

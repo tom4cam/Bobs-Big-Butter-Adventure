@@ -1,5 +1,5 @@
 import { getAdminToken } from './adminToken';
-import type { StoryAnswer, StorySummary, StoryVersion } from './types';
+import type { Lang, StoryAnswer, StorySummary, StoryVersion } from './types';
 
 const FN_BASE = '/api';
 
@@ -35,7 +35,7 @@ async function jsonOrThrow<T>(res: Response): Promise<T> {
 
 export async function createStory(
   answers: StoryAnswer[],
-  language: 'en' | 'sv' | 'bg' | 'es' | 'fr',
+  language: Lang,
   voiceId: string
 ): Promise<StoryVersion> {
   const res = await fetch(`${FN_BASE}/createStory`, {
@@ -123,7 +123,7 @@ export async function deleteStoryVersion(id: string, version: number): Promise<D
 
 export async function translateStory(
   id: string,
-  targetLanguage: 'en' | 'sv' | 'bg' | 'es' | 'fr',
+  targetLanguage: Lang,
   version?: number
 ): Promise<StoryVersion> {
   const res = await fetch(`${FN_BASE}/translateStory`, {

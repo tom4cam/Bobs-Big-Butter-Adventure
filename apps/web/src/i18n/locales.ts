@@ -1,4 +1,4 @@
-import type { Lang } from './index';
+import type { Lang } from '../types';
 
 export const LOCALES: Record<Lang, string> = {
   en: 'en-US',
@@ -6,4 +6,7 @@ export const LOCALES: Record<Lang, string> = {
   bg: 'bg-BG',
   es: 'es-419',
   fr: 'fr-FR',
+  mk: 'mk-MK',
+  'pt-BR': 'pt-BR',
+  'pt-PT': 'pt-PT',
 };
